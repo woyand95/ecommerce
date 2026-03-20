@@ -1,0 +1,83 @@
+services:
+
+  # ── PHP + Apache ────────────────────────────────────────────
+  app:
+    build: .
+    container_name: techstore_app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./storage:/var/www/html/storage
+    environment:
+      APP_ENV: development
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8080
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ecommerce
+      DB_USERNAME: techstore
+      DB_PASSWORD: techstore123
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - techstore
+
+  # ── MySQL 8 ────────────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: techstore_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ecommerce
+      MYSQL_USER: techstore
+      MYSQL_PASSWORD: techstore123
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./database/seeds/01_base_data.sql:/docker-entrypoint-initdb.d/02_base_data.sql
+      - ./database/seeds/02_products.sql:/docker-entrypoint-initdb.d/03_products.sql
+      - ./database/seeds/03_prices_stock_orders.sql:/docker-entrypoint-initdb.d/04_prices.sql
+      - ./database/seeds/04_cms_menus_reviews.sql:/docker-entrypoint-initdb.d/05_cms.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "techstore", "-ptechstore123"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - techstore
+
+  # ── phpMyAdmin (Datenbank-Verwaltung im Browser) ────────────
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: techstore_phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: techstore
+      PMA_PASSWORD: techstore123
+    depends_on:
+      - db
+    networks:
+      - techstore
+
+  # ── Redis (Caching) ─────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: techstore_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - techstore
+
+volumes:
+  db_data:
+
+networks:
+  techstore:
+    driver: bridge
