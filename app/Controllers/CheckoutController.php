@@ -1,0 +1,267 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Core\Controller;
+
+class CheckoutController extends Controller {
+    
+    public function index(array $p = []): void {
+        $customer = $this->customer();
+        if (!$customer) {
+            $_SESSION['intended_url'] = '/checkout';
+            session_flash('error', 'Bitte melden Sie sich an, um zur Kasse zu gehen.');
+            $this->redirect('/auth/login');
+            return;
+        }
+        
+        $cart = $this->getCart();
+        if (!$cart) {
+            session_flash('error', 'Ihr Warenkorb ist leer.');
+            $this->redirect('/cart');
+            return;
+        }
+        
+        $branchId = $_SESSION['branch_id'] ?? 1;
+        
+        // Get cart items with prices
+        $items = $this->db->fetchAll("
+            SELECT ci.*, p.name, p.sku, pp.price, pp.vat_rate, (pp.price * ci.quantity) as line_total
+            FROM cart_items ci
+            JOIN products p ON p.id = ci.product_id
+            LEFT JOIN product_prices pp ON pp.product_id = p.id AND pp.branch_id = ?
+            WHERE ci.cart_id = ?
+        ", [$branchId, $cart['id']]);
+        
+        if (empty($items)) {
+            session_flash('error', 'Ihr Warenkorb ist leer.');
+            $this->redirect('/cart');
+            return;
+        }
+        
+        $subtotal = array_sum(array_column($items, 'line_total'));
+        $shippingCost = $subtotal > 50 ? 0 : 4.99;
+        $total = $subtotal + $shippingCost;
+        
+        // Get customer addresses
+        $addresses = $this->db->fetchAll(
+            "SELECT * FROM customer_addresses WHERE customer_id = ? ORDER BY is_default DESC, id DESC",
+            [$customer['id']]
+        );
+        
+        // Get payment methods
+        $paymentMethods = $this->db->fetchAll(
+            "SELECT * FROM payment_methods WHERE is_active = 1 AND branch_id IN (?, NULL) ORDER BY sort_order",
+            [$branchId]
+        );
+        
+        $this->view('checkout/index', [
+            'title' => 'Kasse',
+            'items' => $items,
+            'subtotal' => $subtotal,
+            'shipping_cost' => $shippingCost,
+            'total' => $total,
+            'addresses' => $addresses,
+            'payment_methods' => $paymentMethods,
+            'customer' => $customer,
+            'csrf_token' => \App\Core\Csrf::token()
+        ]);
+    }
+
+    public function placeOrder(array $p = []): void {
+        $customer = $this->customer();
+        if (!$customer) {
+            session_flash('error', 'Bitte melden Sie sich an.');
+            $this->redirect('/auth/login');
+            return;
+        }
+        
+        try {
+            $this->db->beginTransaction();
+            
+            $cart = $this->getCart();
+            if (!$cart) {
+                throw new \Exception('Warenkorb nicht gefunden.');
+            }
+            
+            $branchId = $_SESSION['branch_id'] ?? 1;
+            
+            // Get form data
+            $data = $this->request->all();
+            
+            // Validate required fields
+            $requiredFields = ['address_id', 'payment_method'];
+            foreach ($requiredFields as $field) {
+                if (empty($data[$field])) {
+                    throw new \Exception("Bitte wählen Sie {$field} aus.");
+                }
+            }
+            
+            // Verify address belongs to customer
+            $address = $this->db->fetchOne(
+                "SELECT * FROM customer_addresses WHERE id = ? AND customer_id = ?",
+                [$data['address_id'], $customer['id']]
+            );
+            
+            if (!$address) {
+                throw new \Exception('Adresse nicht gefunden.');
+            }
+            
+            // Get cart items
+            $items = $this->db->fetchAll("
+                SELECT ci.*, pp.price, pp.vat_rate
+                FROM cart_items ci
+                JOIN products p ON p.id = ci.product_id
+                LEFT JOIN product_prices pp ON pp.product_id = p.id AND pp.branch_id = ?
+                WHERE ci.cart_id = ?
+            ", [$branchId, $cart['id']]);
+            
+            if (empty($items)) {
+                throw new \Exception('Warenkorb ist leer.');
+            }
+            
+            // Calculate totals
+            $subtotal = array_sum(array_map(fn($i) => $i['price'] * $i['quantity'], $items));
+            $shippingCost = $subtotal > 50 ? 0 : 4.99;
+            
+            // Apply coupons if any
+            $discount = 0;
+            if (!empty($data['coupon_code'])) {
+                $campaignService = new \App\Services\CampaignService();
+                [$discount, $coupon] = $campaignService->applyCoupon(
+                    $data['coupon_code'],
+                    $branchId,
+                    $customer['id'],
+                    $customer['customer_type'] ?? 'B2C',
+                    $subtotal
+                );
+            }
+            
+            $total = $subtotal + $shippingCost - $discount;
+            
+            // Create order
+            $orderNumber = 'ORD-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
+            
+            $this->db->execute("
+                INSERT INTO orders (
+                    order_number, branch_id, customer_id, 
+                    status, payment_status, fulfillment_status,
+                    subtotal, shipping_cost, discount_amount, total,
+                    currency_code, notes, created_at, updated_at
+                ) VALUES (?, ?, ?, 'pending', 'pending', 'unfulfilled', ?, ?, ?, ?, 'EUR', ?, NOW(), NOW())
+            ", [
+                $orderNumber,
+                $branchId,
+                $customer['id'],
+                $subtotal,
+                $shippingCost,
+                $discount,
+                $total,
+                $data['notes'] ?? null
+            ]);
+            
+            $orderId = $this->db->lastInsertId();
+            
+            // Create order items
+            foreach ($items as $item) {
+                $this->db->execute("
+                    INSERT INTO order_items (
+                        order_id, product_id, variant_id, quantity,
+                        unit_price, vat_rate, total_price
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ", [
+                    $orderId,
+                    $item['product_id'],
+                    $item['variant_id'] ?? null,
+                    $item['quantity'],
+                    $item['price'],
+                    $item['vat_rate'] ?? 19,
+                    $item['price'] * $item['quantity']
+                ]);
+                
+                // Update stock
+                $this->db->execute("
+                    UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?
+                ", [$item['quantity'], $item['product_id']]);
+            }
+            
+            // Create order address snapshot
+            $this->db->execute("
+                INSERT INTO order_addresses (
+                    order_id, address_type, first_name, last_name, company_name,
+                    address_line1, address_line2, city, postal_code, country_code, phone
+                ) VALUES (?, 'shipping', ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ", [
+                $orderId,
+                $address['first_name'],
+                $address['last_name'],
+                $address['company_name'],
+                $address['address_line1'],
+                $address['address_line2'] ?? null,
+                $address['city'],
+                $address['postal_code'],
+                $address['country_code'],
+                $address['phone']
+            ]);
+            
+            // Clear cart
+            $this->db->execute("DELETE FROM cart_items WHERE cart_id = ?", [$cart['id']]);
+            
+            $this->db->commit();
+            
+            // Send order confirmation email (stub - implement later)
+            // MailService::sendOrderConfirmation($orderId);
+            
+            session_flash('success', 'Bestellung erfolgreich! Ihre Bestellnummer ist: ' . $orderNumber);
+            $this->redirect('/checkout/success/' . $orderId);
+            
+        } catch (\Throwable $e) {
+            $this->db->rollBack();
+            error_log("Place order error: " . $e->getMessage());
+            session_flash('error', 'Ein Fehler ist aufgetreten: ' . $e->getMessage());
+            $this->redirect('/checkout');
+        }
+    }
+
+    public function success(array $p = []): void {
+        $orderId = (int) ($p['id'] ?? 0);
+        
+        if ($orderId <= 0) {
+            $this->redirect('/');
+            return;
+        }
+        
+        $customer = $this->customer();
+        if (!$customer) {
+            $this->redirect('/');
+            return;
+        }
+        
+        $order = $this->db->fetchOne(
+            "SELECT * FROM orders WHERE id = ? AND customer_id = ?",
+            [$orderId, $customer['id']]
+        );
+        
+        if (!$order) {
+            session_flash('error', 'Bestellung nicht gefunden.');
+            $this->redirect('/account/orders');
+            return;
+        }
+        
+        $items = $this->db->fetchAll(
+            "SELECT oi.*, p.name, p.slug FROM order_items oi JOIN products p ON p.id = oi.product_id WHERE oi.order_id = ?",
+            [$orderId]
+        );
+        
+        $this->view('checkout/success', [
+            'title' => 'Bestellung erfolgreich',
+            'order' => $order,
+            'items' => $items
+        ]);
+    }
+
+    private function getCart(): ?array {
+        $sessionId = session_id();
+        return $this->db->fetchOne("SELECT id FROM carts WHERE session_id = ?", [$sessionId]);
+    }
+}
