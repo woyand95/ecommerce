@@ -86,7 +86,7 @@ class Router
 
         // 404
         $this->response->setStatusCode(404);
-        $this->callAction([Controllers\ErrorController::class, 'notFound'], []);
+        $this->callAction([\App\Controllers\ErrorController::class, 'notFound'], []);
     }
 
     // ── Private helpers ──────────────────────────────────────
