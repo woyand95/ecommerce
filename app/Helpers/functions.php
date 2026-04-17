@@ -56,33 +56,41 @@ if (!function_exists('asset')) {
 function asset(string $path): string
 {
     $v = defined('APP_VERSION') ? '?v=' . APP_VERSION : '';
-    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
-    $rootDir = dirname($scriptDir);
-    $base = ($rootDir !== '/' && $rootDir !== '\\') ? $rootDir : '';
-    return rtrim($base, '/') . '/public/assets/' . ltrim($path, '/') . $v;
+    $appUrlPath = parse_url(rtrim($_ENV['APP_URL'] ?? $_SERVER['APP_URL'] ?? config('app.url', ''), '/'), PHP_URL_PATH) ?? '';
+    return rtrim($appUrlPath, '/') . '/assets/' . ltrim($path, '/') . $v;
 }
 }
 
 if (!function_exists('url')) {
 function url(string $path, array $query = []): string
 {
-    $base = rtrim(config('app.url'), '/');
-    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
-    $rootDir = dirname($scriptDir);
-
-    // If not absolute domain URL, append root directory dynamically
-    if (!preg_match('#^https?://#', $base) && $rootDir !== '/' && $rootDir !== '\\') {
-        $base .= $rootDir;
+    $appUrlPath = '';
+    if (isset($_SERVER['APP_URL'])) {
+        $appUrlPath = parse_url(rtrim($_SERVER['APP_URL'], '/'), PHP_URL_PATH) ?? '';
+    } else {
+        $envFile = ROOT_PATH . '/.env';
+        $appUrl = '';
+        if (file_exists($envFile)) {
+            $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                if (str_starts_with(trim($line), 'APP_URL=')) {
+                    $appUrl = trim(explode('=', $line, 2)[1], " \t\n\r\0\x0B\"'");
+                    break;
+                }
+            }
+        }
+        $appUrlPath = parse_url(rtrim($appUrl ?: config('app.url', ''), '/'), PHP_URL_PATH) ?? '';
     }
     $path = '/' . ltrim($path, '/');
 
-    // Optional: inject language prefix if not default
+    $langPrefix = '/de';
     if (isset($_SESSION['lang']) && $_SESSION['lang'] !== 'de') {
-        $path = '/' . $_SESSION['lang'] . $path;
+        $langPrefix = '/' . $_SESSION['lang'];
     }
 
     $qs = $query ? '?' . http_build_query($query) : '';
-    return $base . $path . $qs;
+
+    return $appUrlPath . $langPrefix . $path . $qs;
 }
 }
 
