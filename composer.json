@@ -10,6 +10,7 @@
         "ext-intl": "*"
     },
     "autoload": {
+
         "classmap": ["app/Core/Stubs.php", "app/Models/Stubs.php", "app/Middleware/Stubs.php", "app/Controllers/Stubs.php", "app/Services/CoreServices.php"],
         "psr-4": {
             "App\\": "app/"
