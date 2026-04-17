@@ -94,10 +94,13 @@ class Router
     {
         // Merge group stack
         $prefix     = implode('', array_column($this->groupStack, 'prefix'));
-        $allMw      = array_merge(
-            ...array_column($this->groupStack, 'middleware'),
-            $middleware
-        );
+
+        $allMw = [];
+        foreach ($this->groupStack as $group) {
+            $allMw = array_merge($allMw, $group['middleware']);
+        }
+        $allMw = array_merge($allMw, $middleware);
+
         $fullUri    = $prefix . $uri;
         $pattern    = $this->buildPattern($fullUri);
 
