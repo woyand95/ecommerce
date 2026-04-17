@@ -159,10 +159,10 @@ $router->group('/api/v1', function($r) {
 
     $r->get('/categories',        [Api\CategoryController::class, 'index']);
 
-    $r->get('/cart',              [Api\CartController::class, 'index'],  ['api']);
-    $r->post('/cart/add',         [Api\CartController::class, 'add'],    ['api', 'branch', 'csrf']);
-    $r->patch('/cart/{id}',       [Api\CartController::class, 'update'], ['api', 'branch', 'csrf']);
-    $r->delete('/cart/{id}',      [Api\CartController::class, 'remove'], ['api', 'branch', 'csrf']);
+    $r->get('/cart',              [Controllers\CartController::class, 'indexApi'],  ['api']);
+    $r->post('/cart/add',         [Controllers\CartController::class, 'addApi'],    ['api', 'branch', 'csrf']);
+    $r->patch('/cart/{id}',       [Controllers\CartController::class, 'updateApi'], ['api', 'branch', 'csrf']);
+    $r->delete('/cart/{id}',      [Controllers\CartController::class, 'removeApi'], ['api', 'branch', 'csrf']);
 
     $r->post('/orders',           [Api\OrderController::class, 'store'], ['api', 'branch', 'csrf']);
     $r->get('/orders',            [Api\OrderController::class, 'index'], ['api']);
