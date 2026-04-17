@@ -56,7 +56,9 @@ if (!function_exists('asset')) {
 function asset(string $path): string
 {
     $v = defined('APP_VERSION') ? '?v=' . APP_VERSION : '';
-    return '/assets/' . ltrim($path, '/') . $v;
+    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
+    $base = ($scriptDir !== '/' && $scriptDir !== '\\') ? $scriptDir : '';
+    return rtrim($base, '/') . '/assets/' . ltrim($path, '/') . $v;
 }
 }
 
@@ -64,6 +66,10 @@ if (!function_exists('url')) {
 function url(string $path, array $query = []): string
 {
     $base = rtrim(config('app.url'), '/');
+    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
+    if ($scriptDir !== '/' && $scriptDir !== '\\') {
+        $base .= $scriptDir;
+    }
     $path = '/' . ltrim($path, '/');
 
     // Optional: inject language prefix if not default
