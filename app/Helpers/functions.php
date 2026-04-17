@@ -57,8 +57,9 @@ function asset(string $path): string
 {
     $v = defined('APP_VERSION') ? '?v=' . APP_VERSION : '';
     $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
-    $base = ($scriptDir !== '/' && $scriptDir !== '\\') ? $scriptDir : '';
-    return rtrim($base, '/') . '/assets/' . ltrim($path, '/') . $v;
+    $rootDir = dirname($scriptDir);
+    $base = ($rootDir !== '/' && $rootDir !== '\\') ? $rootDir : '';
+    return rtrim($base, '/') . '/public/assets/' . ltrim($path, '/') . $v;
 }
 }
 
@@ -67,8 +68,11 @@ function url(string $path, array $query = []): string
 {
     $base = rtrim(config('app.url'), '/');
     $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
-    if ($scriptDir !== '/' && $scriptDir !== '\\') {
-        $base .= $scriptDir;
+    $rootDir = dirname($scriptDir);
+
+    // If not absolute domain URL, append root directory dynamically
+    if (!preg_match('#^https?://#', $base) && $rootDir !== '/' && $rootDir !== '\\') {
+        $base .= $rootDir;
     }
     $path = '/' . ltrim($path, '/');
 
