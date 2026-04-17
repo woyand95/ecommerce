@@ -15,11 +15,9 @@ if (file_exists($envFile)) {
             [$name, $value] = explode('=', $line, 2);
             $name = trim($name);
             $value = trim($value, " \t\n\r\0\x0B\"'");
-            if (!array_key_exists($name, $_SERVER) && !array_key_exists($name, $_ENV)) {
-                putenv(sprintf('%s=%s', $name, $value));
-                $_ENV[$name] = $value;
-                $_SERVER[$name] = $value;
-            }
+            putenv(sprintf('%s=%s', $name, $value));
+            $_ENV[$name] = $value;
+            $_SERVER[$name] = $value;
         }
     }
 }

@@ -56,7 +56,22 @@ if (!function_exists('asset')) {
 function asset(string $path): string
 {
     $v = defined('APP_VERSION') ? '?v=' . APP_VERSION : '';
-    $appUrlPath = parse_url(rtrim($_ENV['APP_URL'] ?? $_SERVER['APP_URL'] ?? config('app.url', ''), '/'), PHP_URL_PATH) ?? '';
+
+    $appUrl = $_ENV['APP_URL'] ?? $_SERVER['APP_URL'] ?? '';
+    if (empty($appUrl)) {
+        $envFile = ROOT_PATH . '/.env';
+        if (file_exists($envFile)) {
+            $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                if (str_starts_with(trim($line), 'APP_URL=')) {
+                    $appUrl = trim(explode('=', $line, 2)[1], " \t\n\r\0\x0B\"'");
+                    break;
+                }
+            }
+        }
+    }
+
+    $appUrlPath = parse_url(rtrim($appUrl ?: config('app.url', 'http://localhost/ecommerce'), '/'), PHP_URL_PATH) ?? '';
     return rtrim($appUrlPath, '/') . '/assets/' . ltrim($path, '/') . $v;
 }
 }
