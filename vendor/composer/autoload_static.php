@@ -11,33 +11,66 @@ class ComposerStaticInit8fa45f267c6c9f2df5b33c81f35f9707
     );
 
     public static $prefixLengthsPsr4 = array (
-        'A' => 
+        'A' =>
         array (
             'App\\' => 4,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'App\\' => 
+        'App\\' =>
         array (
             0 => __DIR__ . '/../..' . '/app',
         ),
     );
 
     public static $classMap = array (
+        'App\\Controllers\\AccountController' => __DIR__ . '/../..' . '/app/Controllers/AccountController.php',
+        'App\\Controllers\\Admin\\AuthController' => __DIR__ . '/../..' . '/app/Controllers/Admin/AuthController.php',
+        'App\\Controllers\\Admin\\CategoryController' => __DIR__ . '/../..' . '/app/Controllers/Admin/CategoryController.php',
+        'App\\Controllers\\Admin\\CustomerController' => __DIR__ . '/../..' . '/app/Controllers/Admin/CustomerController.php',
+        'App\\Controllers\\Admin\\DashboardController' => __DIR__ . '/../..' . '/app/Controllers/Admin/DashboardController.php',
+        'App\\Controllers\\Admin\\DocumentController' => __DIR__ . '/../..' . '/app/Controllers/Admin/DocumentController.php',
+        'App\\Controllers\\Admin\\OrderController' => __DIR__ . '/../..' . '/app/Controllers/Admin/OrderController.php',
         'App\\Controllers\\Admin\\PageController' => __DIR__ . '/../..' . '/app/Controllers/Admin/PageController.php',
         'App\\Controllers\\Admin\\ProductController' => __DIR__ . '/../..' . '/app/Controllers/Admin/ProductController.php',
+        'App\\Controllers\\Api\\AuthController' => __DIR__ . '/../..' . '/app/Controllers/Api/AuthController.php',
+        'App\\Controllers\\Api\\OrderController' => __DIR__ . '/../..' . '/app/Controllers/Api/OrderController.php',
         'App\\Controllers\\Api\\ProductController' => __DIR__ . '/../..' . '/app/Controllers/Api/ProductController.php',
+        'App\\Controllers\\AuthController' => __DIR__ . '/../..' . '/app/Controllers/AuthController.php',
+        'App\\Controllers\\CartController' => __DIR__ . '/../..' . '/app/Controllers/CartController.php',
+        'App\\Controllers\\CheckoutController' => __DIR__ . '/../..' . '/app/Controllers/CheckoutController.php',
+        'App\\Controllers\\ErrorController' => __DIR__ . '/../..' . '/app/Controllers/Stubs.php',
         'App\\Controllers\\HomeController' => __DIR__ . '/../..' . '/app/Controllers/HomeController.php',
+        'App\\Controllers\\PageController' => __DIR__ . '/../..' . '/app/Controllers/Stubs.php',
         'App\\Controllers\\ProductController' => __DIR__ . '/../..' . '/app/Controllers/ProductController.php',
+        'App\\Core\\Auth' => __DIR__ . '/../..' . '/app/Core/Stubs.php',
         'App\\Core\\Controller' => __DIR__ . '/../..' . '/app/Core/Controller.php',
+        'App\\Core\\Csrf' => __DIR__ . '/../..' . '/app/Core/Stubs.php',
         'App\\Core\\Database' => __DIR__ . '/../..' . '/app/Core/Database.php',
+        'App\\Core\\Lang' => __DIR__ . '/../..' . '/app/Core/Stubs.php',
         'App\\Core\\Model' => __DIR__ . '/../..' . '/app/Core/Model.php',
+        'App\\Core\\Request' => __DIR__ . '/../..' . '/app/Core/Stubs.php',
+        'App\\Core\\Response' => __DIR__ . '/../..' . '/app/Core/Stubs.php',
         'App\\Core\\Router' => __DIR__ . '/../..' . '/app/Core/Router.php',
         'App\\Core\\TemplateEngine' => __DIR__ . '/../..' . '/app/Core/TemplateEngine.php',
+        'App\\Middleware\\AdminMiddleware' => __DIR__ . '/../..' . '/app/Middleware/Stubs.php',
+        'App\\Middleware\\ApiAuthMiddleware' => __DIR__ . '/../..' . '/app/Middleware/Stubs.php',
+        'App\\Middleware\\AuthMiddleware' => __DIR__ . '/../..' . '/app/Middleware/Stubs.php',
         'App\\Middleware\\BranchMiddleware' => __DIR__ . '/../..' . '/app/Middleware/BranchMiddleware.php',
+        'App\\Middleware\\CsrfMiddleware' => __DIR__ . '/../..' . '/app/Middleware/Stubs.php',
+        'App\\Middleware\\ThrottleMiddleware' => __DIR__ . '/../..' . '/app/Middleware/Stubs.php',
+        'App\\Middleware\\VerifiedCustomerMiddleware' => __DIR__ . '/../..' . '/app/Middleware/Stubs.php',
+        'App\\Models\\Branch' => __DIR__ . '/../..' . '/app/Models/Stubs.php',
+        'App\\Models\\Campaign' => __DIR__ . '/../..' . '/app/Models/Stubs.php',
+        'App\\Models\\Category' => __DIR__ . '/../..' . '/app/Models/Stubs.php',
+        'App\\Models\\Customer' => __DIR__ . '/../..' . '/app/Models/Stubs.php',
         'App\\Models\\Order' => __DIR__ . '/../..' . '/app/Models/Order.php',
         'App\\Models\\Product' => __DIR__ . '/../..' . '/app/Models/Product.php',
+        'App\\Services\\BranchService' => __DIR__ . '/../..' . '/app/Services/CoreServices.php',
+        'App\\Services\\CacheService' => __DIR__ . '/../..' . '/app/Services/CoreServices.php',
+        'App\\Services\\CampaignService' => __DIR__ . '/../..' . '/app/Services/CampaignService.php',
+        'App\\Services\\CartService' => __DIR__ . '/../..' . '/app/Services/CoreServices.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 
