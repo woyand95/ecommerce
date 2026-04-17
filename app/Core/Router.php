@@ -94,10 +94,13 @@ class Router
     {
         // Merge group stack
         $prefix     = implode('', array_column($this->groupStack, 'prefix'));
-        $allMw      = array_merge(
-            ...array_column($this->groupStack, 'middleware'),
-            $middleware
-        );
+
+        $allMw = [];
+        foreach ($this->groupStack as $group) {
+            $allMw = array_merge($allMw, $group['middleware']);
+        }
+        $allMw = array_merge($allMw, $middleware);
+
         $fullUri    = $prefix . $uri;
         $pattern    = $this->buildPattern($fullUri);
 
@@ -128,7 +131,15 @@ class Router
 
     private function normalisedUri(): string
     {
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
+        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+        $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? ''); // /ecommerce/public
+        $rootDir = dirname($scriptDir); // /ecommerce
+
+        if ($scriptDir !== '/' && $scriptDir !== '\\' && str_starts_with($uri, $scriptDir)) {
+            $uri = substr($uri, strlen($scriptDir));
+        } elseif ($rootDir !== '/' && $rootDir !== '\\' && str_starts_with($uri, $rootDir)) {
+            $uri = substr($uri, strlen($rootDir));
+        }
 
         // Strip language prefix: /en/, /de/ → store lang, continue without prefix
         if (preg_match('#^/([a-z]{2})(/.*)?$#', $uri, $m)) {

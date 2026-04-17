@@ -47,7 +47,7 @@ class Auth {
     public function customer(): ?array { return $_SESSION['customer'] ?? null; }
     public function adminUser(): ?array { return $_SESSION['admin_user'] ?? null; }
     public function adminCheck(): bool { return isset($_SESSION['admin_id']); }
-    public static function customer(): ?array { return $_SESSION['customer'] ?? null; }
+
 }
 
 class Lang {
