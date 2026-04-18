@@ -45,6 +45,78 @@ class CartController extends Controller {
         ]);
     }
 
+    public function addApi(array $p = []): void {
+        $body = json_decode(file_get_contents('php://input'), true) ?? [];
+        $productId = (int) ($body['product_id'] ?? $this->request->input('product_id', 0));
+        $quantity = max(1, (int) ($body['quantity'] ?? $this->request->input('quantity', 1)));
+        $variantId = isset($body['variant_id']) ? (int) $body['variant_id'] : ($this->request->input('variant_id') ? (int) $this->request->input('variant_id') : null);
+
+        if ($productId <= 0) {
+            $this->json(['error' => 'invalid_product', 'message' => 'Ungueltiges Produkt.'], 400);
+            return;
+        }
+
+        try {
+            $branchId = $_SESSION['branch_id'] ?? 1;
+            $product = $this->db->fetchOne("SELECT p.id, COALESCE((SELECT SUM(quantity - reserved_qty) FROM product_branch_stock WHERE product_id = p.id AND branch_id = ?), 0) AS stock_quantity FROM products p WHERE p.id = ? AND p.is_active = 1", [$branchId, $productId]);
+            if (!$product) {
+                $this->json(['error' => 'not_found', 'message' => 'Produkt nicht gefunden.'], 404);
+                return;
+            }
+
+            $sessionId = session_id();
+            $branchId = $_SESSION['branch_id'] ?? 1;
+            $customerId = $_SESSION['customer_id'] ?? null;
+            $cart = $this->db->fetchOne("SELECT id FROM carts WHERE session_id = ?", [$sessionId]);
+            if (!$cart) {
+                $cartId = $this->db->insert('carts', [
+                    'session_id' => $sessionId,
+                    'branch_id' => $branchId,
+                    'customer_id' => $customerId,
+                    'created_at' => date('Y-m-d H:i:s')
+                ]);
+            } else {
+                $cartId = $cart['id'];
+            }
+
+            $existingItem = null;
+            if ($variantId) {
+                $existingItem = $this->db->fetchOne(
+                    "SELECT id, quantity FROM cart_items WHERE cart_id = ? AND product_id = ? AND variant_id = ?",
+                    [$cartId, $productId, $variantId]
+                );
+            } else {
+                $existingItem = $this->db->fetchOne(
+                    "SELECT id, quantity FROM cart_items WHERE cart_id = ? AND product_id = ? AND variant_id IS NULL",
+                    [$cartId, $productId]
+                );
+            }
+
+            if ($existingItem) {
+                $newQuantity = $existingItem['quantity'] + $quantity;
+                if ($newQuantity > $product['stock_quantity']) {
+                    $this->json(['error' => 'stock', 'message' => 'Nur noch ' . $product['stock_quantity'] . ' Stueck verfuegbar.'], 400);
+                    return;
+                }
+                $this->db->execute("UPDATE cart_items SET quantity = ? WHERE id = ?", [$newQuantity, $existingItem['id']]);
+            } else {
+                if ($quantity > $product['stock_quantity']) {
+                    $this->json(['error' => 'stock', 'message' => 'Nur noch ' . $product['stock_quantity'] . ' Stueck verfuegbar.'], 400);
+                    return;
+                }
+                $this->db->execute(
+                    "INSERT INTO cart_items (cart_id, product_id, variant_id, quantity) VALUES (?, ?, ?, ?)",
+                    [$cartId, $productId, $variantId, $quantity]
+                );
+            }
+
+            $count = \App\Services\CartService::count();
+            $this->json(['success' => true, 'message' => 'Zum Warenkorb hinzugefuegt.', 'cart_count' => $count]);
+        } catch (\Throwable $e) {
+            $this->json(['error' => 'server_error', 'message' => 'Ein Fehler ist aufgetreten: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function add(array $p = []): void {
         $productId = (int) $this->request->input('product_id', 0);
         $quantity = max(1, (int) $this->request->input('quantity', 1));
@@ -58,7 +130,8 @@ class CartController extends Controller {
         
         try {
             // Check product exists and is active
-            $product = $this->db->fetchOne("SELECT id, stock_quantity FROM products WHERE id = ? AND is_active = 1", [$productId]);
+            $branchId = $_SESSION['branch_id'] ?? 1;
+            $product = $this->db->fetchOne("SELECT p.id, COALESCE((SELECT SUM(quantity - reserved_qty) FROM product_branch_stock WHERE product_id = p.id AND branch_id = ?), 0) AS stock_quantity FROM products p WHERE p.id = ? AND p.is_active = 1", [$branchId, $productId]);
             if (!$product) {
                 session_flash('error', 'Produkt nicht gefunden.');
                 $this->redirect('/products');
@@ -67,10 +140,12 @@ class CartController extends Controller {
             
             // Get or create cart
             $sessionId = session_id();
+            $branchId = $_SESSION['branch_id'] ?? 1;
+            $customerId = $_SESSION['customer_id'] ?? null;
             $cart = $this->db->fetchOne("SELECT id FROM carts WHERE session_id = ?", [$sessionId]);
             
             if (!$cart) {
-                $this->db->execute("INSERT INTO carts (session_id, created_at) VALUES (?, NOW())", [$sessionId]);
+                $this->db->execute("INSERT INTO carts (session_id, branch_id, customer_id, created_at) VALUES (?, ?, ?, NOW())", [$sessionId, $branchId, $customerId]);
                 $cartId = $this->db->lastInsertId();
             } else {
                 $cartId = $cart['id'];
@@ -152,7 +227,8 @@ class CartController extends Controller {
                 return;
             }
             
-            $item = $this->db->fetchOne("SELECT ci.*, p.stock_quantity FROM cart_items ci JOIN products p ON p.id = ci.product_id WHERE ci.id = ? AND ci.cart_id = ?", [$itemId, $cart['id']]);
+            $branchId = $_SESSION['branch_id'] ?? 1;
+            $item = $this->db->fetchOne("SELECT ci.*, COALESCE((SELECT SUM(quantity - reserved_qty) FROM product_branch_stock WHERE product_id = ci.product_id AND branch_id = ?), 0) AS stock_quantity FROM cart_items ci WHERE ci.id = ? AND ci.cart_id = ?", [$branchId, $itemId, $cart['id']]);
             
             if (!$item) {
                 session_flash('error', 'Artikel nicht im Warenkorb.');

@@ -5,6 +5,23 @@ use App\Controllers;
 use App\Controllers\Admin;
 use App\Controllers\Api;
 
+// ── Load .env ──────────────────────────────────
+$envFile = ROOT_PATH . '/.env';
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (str_starts_with(trim($line), '#')) continue;
+        if (str_contains($line, '=')) {
+            [$name, $value] = explode('=', $line, 2);
+            $name = trim($name);
+            $value = trim($value, " \t\n\r\0\x0B\"'");
+            putenv(sprintf('%s=%s', $name, $value));
+            $_ENV[$name] = $value;
+            $_SERVER[$name] = $value;
+        }
+    }
+}
+
 // ── Environment & debug ───────────────────────
 $config = require CONFIG_PATH . '/app.php';
 define('APP_ENV',   $config['env']);
@@ -88,6 +105,14 @@ $router->group('/account', function($r) {
 //  ADMIN PANEL
 // ════════════════════════════════════════════════════════════
 
+// Public Admin Auth Routes
+$router->group('/admin', function($r) {
+    $r->get( '/login',            [Admin\AuthController::class, 'loginForm']);
+    $r->post('/login',            [Admin\AuthController::class, 'login'],  ['csrf']);
+    $r->get( '/logout',           [Admin\AuthController::class, 'logout']);
+});
+
+// Protected Admin Routes
 $router->group('/admin', function($r) {
     // Dashboard
     $r->get('/',                  [Admin\DashboardController::class, 'index']);
@@ -124,11 +149,6 @@ $router->group('/admin', function($r) {
     // Admin users & roles
     $r->resource('users',         Admin\AdminUserController::class);
 
-    // Auth
-    $r->get( '/login',            [Admin\AuthController::class, 'loginForm']);
-    $r->post('/login',            [Admin\AuthController::class, 'login'],  ['csrf']);
-    $r->get( '/logout',           [Admin\AuthController::class, 'logout']);
-
 }, ['admin']); // 'admin' middleware requires admin session
 
 // ════════════════════════════════════════════════════════════
@@ -142,10 +162,10 @@ $router->group('/api/v1', function($r) {
 
     $r->get('/categories',        [Api\CategoryController::class, 'index']);
 
-    $r->get('/cart',              [Api\CartController::class, 'index'],  ['api']);
-    $r->post('/cart/add',         [Api\CartController::class, 'add'],    ['api', 'branch', 'csrf']);
-    $r->patch('/cart/{id}',       [Api\CartController::class, 'update'], ['api', 'branch', 'csrf']);
-    $r->delete('/cart/{id}',      [Api\CartController::class, 'remove'], ['api', 'branch', 'csrf']);
+    $r->get('/cart',              [Controllers\CartController::class, 'indexApi'],  ['api']);
+    $r->post('/cart/add',         [Controllers\CartController::class, 'addApi'],    ['api', 'branch', 'csrf']);
+    $r->patch('/cart/{id}',       [Controllers\CartController::class, 'updateApi'], ['api', 'branch', 'csrf']);
+    $r->delete('/cart/{id}',      [Controllers\CartController::class, 'removeApi'], ['api', 'branch', 'csrf']);
 
     $r->post('/orders',           [Api\OrderController::class, 'store'], ['api', 'branch', 'csrf']);
     $r->get('/orders',            [Api\OrderController::class, 'index'], ['api']);
