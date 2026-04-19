@@ -105,6 +105,14 @@ $router->group('/account', function($r) {
 //  ADMIN PANEL
 // ════════════════════════════════════════════════════════════
 
+// Public Admin Auth Routes
+$router->group('/admin', function($r) {
+    $r->get( '/login',            [Admin\AuthController::class, 'loginForm']);
+    $r->post('/login',            [Admin\AuthController::class, 'login'],  ['csrf']);
+    $r->get( '/logout',           [Admin\AuthController::class, 'logout']);
+});
+
+// Protected Admin Routes
 $router->group('/admin', function($r) {
     // Dashboard
     $r->get('/',                  [Admin\DashboardController::class, 'index']);
@@ -140,11 +148,6 @@ $router->group('/admin', function($r) {
 
     // Admin users & roles
     $r->resource('users',         Admin\AdminUserController::class);
-
-    // Auth
-    $r->get( '/login',            [Admin\AuthController::class, 'loginForm']);
-    $r->post('/login',            [Admin\AuthController::class, 'login'],  ['csrf']);
-    $r->get( '/logout',           [Admin\AuthController::class, 'logout']);
 
 }, ['admin']); // 'admin' middleware requires admin session
 

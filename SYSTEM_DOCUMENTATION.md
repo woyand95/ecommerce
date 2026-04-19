@@ -156,6 +156,15 @@ Check if the user exists:
 sudo mysql -e "SELECT User, Host FROM mysql.user;"
 ```
 
+## 10. Admin Dashboard & Login
+To access the backend administrator panel, navigate directly to `/admin/login`.
+
+**Demo Credentials:**
+- Email: `admin@techstore.de`
+- Password: `Admin1234!`
+
+Note: The admin panel is completely siloed behind the `AdminMiddleware`. Users accessing `/admin` routes who are not logged in as Administrators will be safely redirected to `/admin/login`.
+
 ### Broken Page Layout or Missing CSS
 Ensure that the `APP_URL` in `.env` is correctly pointing to your local/production domain URL so `asset()` functions compute the fully-qualified paths effectively.
 
