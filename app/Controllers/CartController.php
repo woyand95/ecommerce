@@ -15,22 +15,24 @@ class CartController extends Controller {
             $branchId = $_SESSION['branch_id'] ?? 1;
             
             $items = $this->db->fetchAll("
-                SELECT ci.*, p.name, p.slug, p.sku, 
-                       COALESCE(pt.name, p.name) as translated_name,
-                       pp.price, pp.old_price, pp.vat_rate,
-                       (pp.price * ci.quantity) as line_total,
-                       pi.image_url
+                SELECT ci.*, p.sku,
+                       COALESCE(pt.name, pt_fb.name) as name,
+                       COALESCE(pt.url_slug, pt_fb.url_slug) as slug,
+                       pbp.price,
+                       pbp.price as old_price,
+                       (pbp.price * ci.quantity) as line_total,
+                       pi.file_path as image_url,
+                       b.tax_rate as vat_rate
                 FROM cart_items ci
+                JOIN carts c ON c.id = ci.cart_id
+                JOIN branches b ON b.id = c.branch_id
                 JOIN products p ON p.id = ci.product_id
                 LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.lang_code = ?
-                LEFT JOIN product_prices pp ON pp.product_id = p.id AND pp.branch_id = ?
-                LEFT JOIN (
-                    SELECT pi.product_id, pi.image_url, 
-                           ROW_NUMBER() OVER (PARTITION BY pi.product_id ORDER BY pi.is_primary DESC, pi.sort_order) as rn
-                    FROM product_images pi WHERE pi.is_active = 1
-                ) pi ON pi.product_id = p.id AND pi.rn = 1
+                LEFT JOIN product_translations pt_fb ON pt_fb.product_id = p.id AND pt_fb.lang_code = 'de'
+                LEFT JOIN product_branch_prices pbp ON pbp.product_id = p.id AND pbp.branch_id = ? AND pbp.variant_id IS NULL AND pbp.price_group = 'standard'
+                LEFT JOIN product_images pi ON pi.product_id = p.id AND pi.is_primary = 1
                 WHERE ci.cart_id = ?
-                ORDER BY ci.created_at DESC
+                ORDER BY ci.added_at DESC
             ", [$this->lang(), $branchId, $cart['id']]);
             
             $subtotal = array_sum(array_column($items, 'line_total'));
@@ -257,6 +259,56 @@ class CartController extends Controller {
             session_flash('error', 'Ein Fehler ist aufgetreten.');
             $this->redirect('/cart');
         }
+    }
+
+    public function indexApi(array $p = []): void {
+        $cart = $this->getCart();
+        $items = [];
+        $subtotal = 0;
+
+        if ($cart) {
+            $branchId = $_SESSION['branch_id'] ?? 1;
+
+            $dbItems = $this->db->fetchAll("
+                SELECT ci.id as item_id, ci.quantity, p.sku,
+                       COALESCE(pt.name, pt_fb.name) as name,
+                       COALESCE(pt.url_slug, pt_fb.url_slug) as url_slug,
+                       pbp.price,
+                       (pbp.price * ci.quantity) as line_total,
+                       pi.file_path as image
+                FROM cart_items ci
+                JOIN carts c ON c.id = ci.cart_id
+                JOIN products p ON p.id = ci.product_id
+                LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.lang_code = ?
+                LEFT JOIN product_translations pt_fb ON pt_fb.product_id = p.id AND pt_fb.lang_code = 'de'
+                LEFT JOIN product_branch_prices pbp ON pbp.product_id = p.id AND pbp.branch_id = ? AND pbp.variant_id IS NULL AND pbp.price_group = 'standard'
+                LEFT JOIN product_images pi ON pi.product_id = p.id AND pi.is_primary = 1
+                WHERE ci.cart_id = ?
+                ORDER BY ci.added_at DESC
+            ", [$this->lang(), $branchId, $cart['id']]);
+
+            foreach($dbItems as $dbItem) {
+                $subtotal += (float)$dbItem['line_total'];
+                $items[] = [
+                    'id' => $dbItem['item_id'],
+                    'name' => $dbItem['name'],
+                    'image' => $dbItem['image'] ? asset('img/' . $dbItem['image']) : asset('images/placeholder.webp'),
+                    'url' => url('/products/' . $dbItem['url_slug']),
+                    'price' => (float)$dbItem['price'],
+                    'price_formatted' => format_money($dbItem['price']),
+                    'quantity' => $dbItem['quantity'],
+                    'line_total' => (float)$dbItem['line_total'],
+                    'line_total_formatted' => format_money($dbItem['line_total'])
+                ];
+            }
+        }
+
+        $this->json([
+            'items' => $items,
+            'subtotal' => $subtotal,
+            'subtotal_formatted' => format_money($subtotal),
+            'cart_count' => array_sum(array_column($items, 'quantity'))
+        ]);
     }
 
     public function remove(array $p = []): void {
