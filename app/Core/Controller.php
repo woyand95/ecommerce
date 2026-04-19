@@ -8,10 +8,10 @@ class Controller {
     protected Database $db;
     protected string   $scope;
 
-    public function __construct(string $scope = 'frontend') {
+    public function __construct(Request $request = null, Response $response = null, string $scope = "frontend") {
         $this->scope    = $scope;
-        $this->request  = new Request();
-        $this->response = new Response();
+        $this->request = clone ($request ?? new Request());
+        $this->response = clone ($response ?? new Response());
         $this->db       = Database::getInstance();
     }
 
