@@ -50,13 +50,13 @@ UNLOCK TABLES;
 LOCK TABLES `admin_users` WRITE;
 /*!40000 ALTER TABLE `admin_users` DISABLE KEYS */;
 INSERT INTO `admin_users` VALUES
-(1,NULL,1,'System','Administrator','admin@techstore.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',NULL,'2025-03-19 09:00:00',NULL,1,'2026-04-17 08:58:36',NULL),
-(2,NULL,2,'Klaus','Bergmann','k.bergmann@techstore.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',NULL,'2025-03-18 14:22:00',NULL,1,'2026-04-17 08:58:36',NULL),
-(3,1,3,'Sabine','Müller','s.mueller.koeln@techstore.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',NULL,'2025-03-19 08:15:00',NULL,1,'2026-04-17 08:58:36',NULL),
-(4,2,3,'Thomas','Hoffmann','t.hoffmann.berlin@techstore.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',NULL,'2025-03-17 11:30:00',NULL,1,'2026-04-17 08:58:36',NULL),
-(5,3,3,'Maria','Schneider','m.schneider.muc@techstore.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',NULL,'2025-03-18 09:45:00',NULL,1,'2026-04-17 08:58:36',NULL),
-(6,4,3,'Jens','Krause','j.krause.hh@techstore.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',NULL,'2025-03-16 16:00:00',NULL,1,'2026-04-17 08:58:36',NULL),
-(7,NULL,4,'Anna','Weber','a.weber@techstore.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',NULL,'2025-03-19 10:00:00',NULL,1,'2026-04-17 08:58:36',NULL);
+(1,NULL,1,'System','Administrator','admin@techstore.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq',NULL,'2025-03-19 09:00:00',NULL,1,'2026-04-17 08:58:36',NULL),
+(2,NULL,2,'Klaus','Bergmann','k.bergmann@techstore.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq',NULL,'2025-03-18 14:22:00',NULL,1,'2026-04-17 08:58:36',NULL),
+(3,1,3,'Sabine','Müller','s.mueller.koeln@techstore.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq',NULL,'2025-03-19 08:15:00',NULL,1,'2026-04-17 08:58:36',NULL),
+(4,2,3,'Thomas','Hoffmann','t.hoffmann.berlin@techstore.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq',NULL,'2025-03-17 11:30:00',NULL,1,'2026-04-17 08:58:36',NULL),
+(5,3,3,'Maria','Schneider','m.schneider.muc@techstore.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq',NULL,'2025-03-18 09:45:00',NULL,1,'2026-04-17 08:58:36',NULL),
+(6,4,3,'Jens','Krause','j.krause.hh@techstore.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq',NULL,'2025-03-16 16:00:00',NULL,1,'2026-04-17 08:58:36',NULL),
+(7,NULL,4,'Anna','Weber','a.weber@techstore.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq',NULL,'2025-03-19 10:00:00',NULL,1,'2026-04-17 08:58:36',NULL);
 /*!40000 ALTER TABLE `admin_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -202,22 +202,22 @@ UNLOCK TABLES;
 LOCK TABLES `customers` WRITE;
 /*!40000 ALTER TABLE `customers` DISABLE KEYS */;
 INSERT INTO `customers` VALUES
-(1,1,'private','Lena','Fischer','lena.fischer@gmail.com','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 157 11223344',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-18 20:11:00','2026-04-17 08:58:36',NULL),
-(2,1,'private','Markus','Wagner','markus.wagner@web.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 172 9988776',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,0,'2025-03-17 12:35:00','2026-04-17 08:58:36',NULL),
-(3,1,'company','Stefan','Brandt','s.brandt@brandtgmbh.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 221 334455',NULL,'de','Brandt GmbH','DE287654321','HRB 88421',1,'approved','2025-02-10 10:00:00',3,'b2b',1,1,0,'2025-03-19 09:00:00','2026-04-17 08:58:36',NULL),
-(4,1,'company','Nicole','Zimmermann','n.zimmermann@z-logistics.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 221 667788',NULL,'de','Z-Logistics KG','DE199887766','HRB 55320',1,'approved','2025-01-15 14:00:00',3,'b2b',1,1,0,'2025-03-16 14:20:00','2026-04-17 08:58:36',NULL),
-(5,1,'company','Peter','Schulz','p.schulz@schulz-it.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 221 556677',NULL,'de','Schulz IT Solutions','DE334455666','HRB 12984',0,'pending',NULL,NULL,'standard',1,1,0,'2025-03-10 11:00:00','2026-04-17 08:58:36',NULL),
-(6,1,'private','Julia','Koch','julia.koch@hotmail.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 160 1234567',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-14 18:45:00','2026-04-17 08:58:36',NULL),
-(7,2,'private','Felix','Bauer','felix.bauer@berlin.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 179 8887766',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-19 07:30:00','2026-04-17 08:58:36',NULL),
-(8,2,'private','Sarah','Richter','sarah.richter@gmx.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 152 4455667',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,0,'2025-03-12 15:20:00','2026-04-17 08:58:36',NULL),
-(9,2,'company','Andreas','Klein','a.klein@kleintec.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 30 778899',NULL,'de','KleinTec GmbH','DE412233445','HRB 33210',1,'approved','2025-01-20 09:00:00',4,'b2b',1,1,0,'2025-03-18 13:00:00','2026-04-17 08:58:36',NULL),
-(10,2,'private','Emma','Wolf','emma.wolf@icloud.com','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 176 3344556',NULL,'en',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-15 21:00:00','2026-04-17 08:58:36',NULL),
-(11,3,'private','Lukas','Braun','lukas.braun@yahoo.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 171 6677889',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,0,'2025-03-19 11:10:00','2026-04-17 08:58:36',NULL),
-(12,3,'company','Monika','Lange','m.lange@baysolutions.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 89 998877',NULL,'de','Bay Solutions AG','DE556677889','HRB 67890',1,'approved','2025-02-05 11:30:00',5,'b2b',1,1,0,'2025-03-17 10:00:00','2026-04-17 08:58:36',NULL),
-(13,4,'private','Hannah','Schmitt','hannah.schmitt@t-online.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 40 112244',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-18 19:05:00','2026-04-17 08:58:36',NULL),
-(14,4,'company','Bernd','Neumann','b.neumann@nordseehandel.de','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+49 40 335577',NULL,'de','Nordsee Handel GmbH','DE778899001','HRB 54321',1,'approved','2025-03-01 08:00:00',6,'b2b',1,1,0,'2025-03-19 08:30:00','2026-04-17 08:58:36',NULL),
-(15,5,'private','Sophie','Huber','sophie.huber@gmx.at','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+43 676 1122334',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-16 17:00:00','2026-04-17 08:58:36',NULL),
-(16,5,'company','Wolfgang','Gruber','w.gruber@alphatechnik.at','$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','+43 1 889900',NULL,'de','Alpha Technik GmbH','ATU55443322','FN 445566g',1,'approved','2025-02-20 13:00:00',2,'b2b',1,1,0,'2025-03-19 09:45:00','2026-04-17 08:58:36',NULL);
+(1,1,'private','Lena','Fischer','lena.fischer@gmail.com','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 157 11223344',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-18 20:11:00','2026-04-17 08:58:36',NULL),
+(2,1,'private','Markus','Wagner','markus.wagner@web.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 172 9988776',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,0,'2025-03-17 12:35:00','2026-04-17 08:58:36',NULL),
+(3,1,'company','Stefan','Brandt','s.brandt@brandtgmbh.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 221 334455',NULL,'de','Brandt GmbH','DE287654321','HRB 88421',1,'approved','2025-02-10 10:00:00',3,'b2b',1,1,0,'2025-03-19 09:00:00','2026-04-17 08:58:36',NULL),
+(4,1,'company','Nicole','Zimmermann','n.zimmermann@z-logistics.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 221 667788',NULL,'de','Z-Logistics KG','DE199887766','HRB 55320',1,'approved','2025-01-15 14:00:00',3,'b2b',1,1,0,'2025-03-16 14:20:00','2026-04-17 08:58:36',NULL),
+(5,1,'company','Peter','Schulz','p.schulz@schulz-it.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 221 556677',NULL,'de','Schulz IT Solutions','DE334455666','HRB 12984',0,'pending',NULL,NULL,'standard',1,1,0,'2025-03-10 11:00:00','2026-04-17 08:58:36',NULL),
+(6,1,'private','Julia','Koch','julia.koch@hotmail.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 160 1234567',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-14 18:45:00','2026-04-17 08:58:36',NULL),
+(7,2,'private','Felix','Bauer','felix.bauer@berlin.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 179 8887766',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-19 07:30:00','2026-04-17 08:58:36',NULL),
+(8,2,'private','Sarah','Richter','sarah.richter@gmx.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 152 4455667',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,0,'2025-03-12 15:20:00','2026-04-17 08:58:36',NULL),
+(9,2,'company','Andreas','Klein','a.klein@kleintec.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 30 778899',NULL,'de','KleinTec GmbH','DE412233445','HRB 33210',1,'approved','2025-01-20 09:00:00',4,'b2b',1,1,0,'2025-03-18 13:00:00','2026-04-17 08:58:36',NULL),
+(10,2,'private','Emma','Wolf','emma.wolf@icloud.com','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 176 3344556',NULL,'en',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-15 21:00:00','2026-04-17 08:58:36',NULL),
+(11,3,'private','Lukas','Braun','lukas.braun@yahoo.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 171 6677889',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,0,'2025-03-19 11:10:00','2026-04-17 08:58:36',NULL),
+(12,3,'company','Monika','Lange','m.lange@baysolutions.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 89 998877',NULL,'de','Bay Solutions AG','DE556677889','HRB 67890',1,'approved','2025-02-05 11:30:00',5,'b2b',1,1,0,'2025-03-17 10:00:00','2026-04-17 08:58:36',NULL),
+(13,4,'private','Hannah','Schmitt','hannah.schmitt@t-online.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 40 112244',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-18 19:05:00','2026-04-17 08:58:36',NULL),
+(14,4,'company','Bernd','Neumann','b.neumann@nordseehandel.de','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+49 40 335577',NULL,'de','Nordsee Handel GmbH','DE778899001','HRB 54321',1,'approved','2025-03-01 08:00:00',6,'b2b',1,1,0,'2025-03-19 08:30:00','2026-04-17 08:58:36',NULL),
+(15,5,'private','Sophie','Huber','sophie.huber@gmx.at','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+43 676 1122334',NULL,'de',NULL,NULL,NULL,0,'pending',NULL,NULL,'standard',1,1,1,'2025-03-16 17:00:00','2026-04-17 08:58:36',NULL),
+(16,5,'company','Wolfgang','Gruber','w.gruber@alphatechnik.at','$2y$10$PEQ.OWveJRTjhvlYRqG6aOrJ4QwV1nNhzW.vWGBBQXiEBC42rjLEq','+43 1 889900',NULL,'de','Alpha Technik GmbH','ATU55443322','FN 445566g',1,'approved','2025-02-20 13:00:00',2,'b2b',1,1,0,'2025-03-19 09:45:00','2026-04-17 08:58:36',NULL);
 /*!40000 ALTER TABLE `customers` ENABLE KEYS */;
 UNLOCK TABLES;
 
