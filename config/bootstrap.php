@@ -83,9 +83,10 @@ $router->group('/cart', function($r) {
 
 // ── Checkout ──────────────────────────────────
 $router->group('/checkout', function($r) {
-    $r->get( '/',             [Controllers\CheckoutController::class, 'index']);
+    $r->get('',               [Controllers\CheckoutController::class, 'index']);
+    $r->get('/',              [Controllers\CheckoutController::class, 'index']);
     $r->post('/place-order',  [Controllers\CheckoutController::class, 'placeOrder'], ['csrf']);
-    $r->get( '/success/{id}', [Controllers\CheckoutController::class, 'success']);
+    $r->get('/success/{id}',  [Controllers\CheckoutController::class, 'success']);
 }, ['auth', 'branch']);
 
 // ── Customer account ──────────────────────────
