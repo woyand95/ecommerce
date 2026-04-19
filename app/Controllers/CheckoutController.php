@@ -52,7 +52,7 @@ class CheckoutController extends Controller {
         
         // Get customer addresses
         $addresses = $this->db->fetchAll(
-            "SELECT * FROM addresses WHERE customer_id = ? ORDER BY is_default_billing DESC, is_default_shipping DESC, id DESC",
+            "SELECT * FROM addresses WHERE customer_id = ? ORDER BY type, is_default DESC, id DESC",
             [$customer['id']]
         );
         

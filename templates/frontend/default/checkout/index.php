@@ -32,7 +32,7 @@
                             <div style="display: flex; flex-direction: column; gap: 12px;">
                                 <?php foreach ($addresses as $addr): ?>
                                 <label style="display: flex; gap: 12px; padding: 16px; border: 1px solid var(--color-gray-200); border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s;" class="address-label">
-                                    <input type="radio" name="address_id" value="<?= $v->e($addr['id']) ?>" required <?= $addr['is_default_shipping'] ? 'checked' : '' ?> style="margin-top: 4px;">
+                                    <input type="radio" name="address_id" value="<?= $v->e($addr['id']) ?>" required <?= $addr['is_default'] ? 'checked' : '' ?> style="margin-top: 4px;">
                                     <div>
                                         <div style="font-weight: 600; margin-bottom: 4px;"><?= $v->e($addr['first_name'] . ' ' . $addr['last_name']) ?></div>
                                         <div style="font-size: 14px; color: var(--color-gray-600);">
