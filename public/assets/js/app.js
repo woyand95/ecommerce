@@ -177,8 +177,10 @@ const CartDrawer = (() => {
 
     if (footer) {
       footer.hidden = false;
-      const totalsEl = footer.querySelector('.cart-total-value');
-      if (totalsEl) totalsEl.textContent = data.total_formatted;
+      const totalsEls = footer.querySelectorAll('.cart-total-value');
+      if (totalsEls.length > 0) {
+        totalsEls.forEach(el => el.textContent = data.subtotal_formatted || data.total_formatted);
+      }
     }
   }
 
