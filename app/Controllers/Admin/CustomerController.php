@@ -88,7 +88,7 @@ class CustomerController extends Controller {
         
         // Get customer addresses
         $addresses = $this->db->fetchAll(
-            "SELECT * FROM customer_addresses WHERE customer_id = ? ORDER BY is_default DESC",
+            "SELECT * FROM addresses WHERE customer_id = ? ORDER BY is_default DESC",
             [$customerId]
         );
         

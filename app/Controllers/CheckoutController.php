@@ -107,7 +107,7 @@ class CheckoutController extends Controller {
             
             // Verify address belongs to customer
             $address = $this->db->fetchOne(
-                "SELECT * FROM customer_addresses WHERE id = ? AND customer_id = ?",
+                "SELECT * FROM addresses WHERE id = ? AND customer_id = ?",
                 [$data['address_id'], $customer['id']]
             );
             
