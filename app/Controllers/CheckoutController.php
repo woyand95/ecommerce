@@ -117,10 +117,12 @@ class CheckoutController extends Controller {
             
             // Get cart items
             $items = $this->db->fetchAll("
-                SELECT ci.*, pp.price, pp.vat_rate
+                SELECT ci.*, pbp.price, b.tax_rate as vat_rate
                 FROM cart_items ci
                 JOIN products p ON p.id = ci.product_id
-                LEFT JOIN product_prices pp ON pp.product_id = p.id AND pp.branch_id = ?
+                JOIN carts c ON c.id = ci.cart_id
+                JOIN branches b ON b.id = c.branch_id
+                LEFT JOIN product_branch_prices pbp ON pbp.product_id = p.id AND pbp.branch_id = ? AND pbp.price_group = 'standard' AND pbp.variant_id IS NULL
                 WHERE ci.cart_id = ?
             ", [$branchId, $cart['id']]);
             
