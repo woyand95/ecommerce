@@ -6,8 +6,8 @@ use App\Core\Controller;
 
 class AccountController extends Controller {
     
-    public function __construct(string $scope = 'frontend') {
-        parent::__construct($scope);
+    public function __construct(\App\Core\Request $request = null, \App\Core\Response $response = null) {
+        parent::__construct($request, $response, 'frontend');
         
         // Ensure customer is logged in for all account actions
         if (!$this->customer()) {
