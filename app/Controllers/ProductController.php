@@ -12,11 +12,13 @@ use App\Services\BranchService;
  */
 class ProductController extends Controller
 {
-    public function __construct(
-        private readonly Product  $productModel  = new Product(),
-        private readonly Category $categoryModel = new Category(),
-    ) {
-        parent::__construct();
+    private Product $productModel;
+    private Category $categoryModel;
+
+    public function __construct(\App\Core\Request $request = null, \App\Core\Response $response = null) {
+        parent::__construct($request, $response);
+        $this->productModel = new Product();
+        $this->categoryModel = new Category();
     }
 
     /**
@@ -26,7 +28,7 @@ class ProductController extends Controller
     {
         $branch     = BranchService::getCurrent();
         $lang       = $this->lang();
-        $priceGroup = $this->customer()?['price_group'] ?? 'standard';
+        $priceGroup = ($this->customer() ?? [])['price_group'] ?? 'standard';
 
         $page    = max(1, (int) $this->request->query('page', 1));
         $perPage = 24;
@@ -66,7 +68,7 @@ class ProductController extends Controller
     {
         $branch     = BranchService::getCurrent();
         $lang       = $this->lang();
-        $priceGroup = $this->customer()?['price_group'] ?? 'standard';
+        $priceGroup = ($this->customer() ?? [])['price_group'] ?? 'standard';
 
         $product = $this->productModel->findBySlug($params['slug'], $branch['id'], $lang);
 
