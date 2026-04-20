@@ -248,8 +248,8 @@ class CheckoutController extends Controller {
         }
         
         $items = $this->db->fetchAll(
-            "SELECT oi.*, p.name, p.slug FROM order_items oi JOIN products p ON p.id = oi.product_id WHERE oi.order_id = ?",
-            [$orderId]
+            "SELECT oi.*, COALESCE(pt.url_slug, pt_fb.url_slug) as url_slug FROM order_items oi JOIN products p ON p.id = oi.product_id LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.lang_code = ? LEFT JOIN product_translations pt_fb ON pt_fb.product_id = p.id AND pt_fb.lang_code = 'de' WHERE oi.order_id = ?",
+            [$this->lang(), $orderId]
         );
         
         $this->view('checkout/success', [

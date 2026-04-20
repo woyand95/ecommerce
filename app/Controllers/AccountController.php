@@ -65,14 +65,14 @@ class AccountController extends Controller {
         }
         
         $items = $this->db->fetchAll(
-            "SELECT oi.*, p.name, p.slug, pi.image_url
+            "SELECT oi.*, COALESCE(pt.url_slug, pt_fb.url_slug) as url_slug, pi.file_path as image_url
              FROM order_items oi
              JOIN products p ON p.id = oi.product_id
-             LEFT JOIN (
-                 SELECT product_id, image_url FROM product_images WHERE is_primary = 1 LIMIT 1
-             ) pi ON pi.product_id = p.id
+             LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.lang_code = ?
+             LEFT JOIN product_translations pt_fb ON pt_fb.product_id = p.id AND pt_fb.lang_code = 'de'
+             LEFT JOIN product_images pi ON pi.product_id = p.id AND pi.is_primary = 1
              WHERE oi.order_id = ?",
-            [$orderId]
+            [$this->lang(), $orderId]
         );
         
         $address = $this->db->fetchOne(
