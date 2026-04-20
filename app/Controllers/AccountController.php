@@ -65,14 +65,14 @@ class AccountController extends Controller {
         }
         
         $items = $this->db->fetchAll(
-            "SELECT oi.*, p.name, p.slug, pi.image_url
+            "SELECT oi.*, COALESCE(pt.url_slug, pt_fb.url_slug) as url_slug, pi.file_path as image_url
              FROM order_items oi
              JOIN products p ON p.id = oi.product_id
-             LEFT JOIN (
-                 SELECT product_id, image_url FROM product_images WHERE is_primary = 1 LIMIT 1
-             ) pi ON pi.product_id = p.id
+             LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.lang_code = ?
+             LEFT JOIN product_translations pt_fb ON pt_fb.product_id = p.id AND pt_fb.lang_code = 'de'
+             LEFT JOIN product_images pi ON pi.product_id = p.id AND pi.is_primary = 1
              WHERE oi.order_id = ?",
-            [$orderId]
+            [$this->lang(), $orderId]
         );
         
         $address = $this->db->fetchOne(
@@ -170,7 +170,7 @@ class AccountController extends Controller {
         $customer = $this->customer();
         
         $addresses = $this->db->fetchAll(
-            "SELECT * FROM customer_addresses WHERE customer_id = ? ORDER BY is_default DESC, id DESC",
+            "SELECT * FROM addresses WHERE customer_id = ? ORDER BY is_default DESC, id DESC",
             [$customer['id']]
         );
         
@@ -198,17 +198,17 @@ class AccountController extends Controller {
             // If this is set as default, unset other defaults first
             if (!empty($data['is_default'])) {
                 $this->db->execute(
-                    "UPDATE customer_addresses SET is_default = 0 WHERE customer_id = ?",
+                    "UPDATE addresses SET is_default = 0 WHERE customer_id = ?",
                     [$customer['id']]
                 );
             }
             
             $this->db->execute("
-                INSERT INTO customer_addresses (
-                    customer_id, address_label, first_name, last_name, company_name,
-                    address_line1, address_line2, city, postal_code, country_code,
-                    phone, is_default, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                INSERT INTO addresses (
+                    customer_id, type, label, first_name, last_name, company,
+                    street, address_line2, city, postal_code, country_code,
+                    is_default, created_at
+                ) VALUES (?, 'shipping', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ", [
                 $customer['id'],
                 $data['address_label'] ?? 'Neue Adresse',
@@ -220,7 +220,6 @@ class AccountController extends Controller {
                 $data['city'],
                 $data['postal_code'],
                 $data['country_code'] ?? 'DE',
-                $data['phone'] ?? null,
                 !empty($data['is_default']) ? 1 : 0
             ]);
             
@@ -247,12 +246,12 @@ class AccountController extends Controller {
         try {
             // Verify address belongs to customer
             $exists = $this->db->fetchColumn(
-                "SELECT COUNT(*) FROM customer_addresses WHERE id = ? AND customer_id = ?",
+                "SELECT COUNT(*) FROM addresses WHERE id = ? AND customer_id = ?",
                 [$addressId, $customer['id']]
             );
             
             if ($exists) {
-                $this->db->execute("DELETE FROM customer_addresses WHERE id = ?", [$addressId]);
+                $this->db->execute("DELETE FROM addresses WHERE id = ?", [$addressId]);
                 session_flash('success', 'Adresse gelöscht.');
             }
             
