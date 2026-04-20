@@ -51,7 +51,7 @@
                     <div style="background: white; border: 1px solid var(--color-gray-200); border-radius: var(--radius-lg); padding: 24px;">
                         <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px;">2. Zahlungsart</h2>
                         <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <?php foreach ($paymentMethods as $index => $pm): ?>
+                            <?php foreach ($payment_methods ?? [] as $index => $pm): ?>
                             <label style="display: flex; gap: 12px; padding: 16px; border: 1px solid var(--color-gray-200); border-radius: var(--radius-md); cursor: pointer;">
                                 <input type="radio" name="payment_method" value="<?= $v->e($pm['id']) ?>" required <?= $index === 0 ? 'checked' : '' ?> style="margin-top: 4px;">
                                 <span style="font-weight: 500;"><?= $v->e($pm['name']) ?></span>
