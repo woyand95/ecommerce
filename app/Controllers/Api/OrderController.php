@@ -86,10 +86,10 @@ class OrderController extends Controller {
             $this->db->execute("
                 INSERT INTO orders (
                     order_number, branch_id, customer_id,
-                    status, payment_status, fulfillment_status,
+                    status, payment_status,
                     subtotal, shipping_cost, discount_amount, total,
-                    currency_code, notes, created_at, updated_at
-                ) VALUES (?, ?, ?, 'pending', 'pending', 'unfulfilled', ?, ?, ?, ?, 'EUR', ?, NOW(), NOW())
+                    currency_code, customer_note, billing_address, shipping_address, payment_method, created_at, updated_at
+                ) VALUES (?, ?, ?, 'pending', 'pending', ?, ?, ?, ?, 'EUR', ?, ?, ?, ?, NOW(), NOW())
             ", [
                 $orderNumber,
                 $branchId,
@@ -98,7 +98,10 @@ class OrderController extends Controller {
                 $shippingCost,
                 $discount,
                 $total,
-                $data['notes'] ?? null
+                $data['notes'] ?? null,
+                json_encode($address),
+                json_encode($address),
+                $data['payment_method']
             ]);
             
             $orderId = $this->db->lastInsertId();
@@ -108,8 +111,8 @@ class OrderController extends Controller {
                 $this->db->execute("
                     INSERT INTO order_items (
                         order_id, product_id, variant_id, quantity,
-                        unit_price, vat_rate, total_price
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        unit_price, tax_rate, line_total, product_name, sku
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ", [
                     $orderId,
                     $item['product_id'],
@@ -117,33 +120,18 @@ class OrderController extends Controller {
                     $item['quantity'],
                     $item['price'],
                     $item['vat_rate'] ?? 19,
-                    $item['price'] * $item['quantity']
+                    $item['line_total'],
+                    $item['name'],
+                    $item['sku']
                 ]);
                 
                 // Update stock
                 $this->db->execute("
-                    UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?
-                ", [$item['quantity'], $item['product_id']]);
+                    UPDATE product_branch_stock SET quantity = quantity - ? WHERE product_id = ? AND branch_id = ? AND (variant_id = ? OR variant_id IS NULL)
+                ", [$item['quantity'], $item['product_id'], $branchId, $item['variant_id'] ?? null]);
             }
             
-            // Create order address snapshot
-            $this->db->execute("
-                INSERT INTO order_addresses (
-                    order_id, address_type, first_name, last_name, company_name,
-                    address_line1, address_line2, city, postal_code, country_code, phone
-                ) VALUES (?, 'shipping', ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ", [
-                $orderId,
-                $address['first_name'],
-                $address['last_name'],
-                $address['company_name'],
-                $address['address_line1'],
-                $address['address_line2'] ?? null,
-                $address['city'],
-                $address['postal_code'],
-                $address['country_code'],
-                $address['phone']
-            ]);
+            // Order address snapshot saved directly to json_encode(addresses) mapped already inside `billing_address` / `shipping_address` columns natively upon insert.
             
             // Clear cart
             $this->db->execute("DELETE FROM cart_items WHERE cart_id = ?", [$cart['id']]);
