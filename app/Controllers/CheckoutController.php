@@ -5,6 +5,10 @@ namespace App\Controllers;
 use App\Core\Controller;
 
 class CheckoutController extends Controller {
+
+    public function __construct(\App\Core\Request $request = null, \App\Core\Response $response = null) {
+        parent::__construct($request, $response);
+    }
     
     public function index(array $p = []): void {
         $customer = $this->customer();
@@ -26,10 +30,13 @@ class CheckoutController extends Controller {
         
         // Get cart items with prices
         $items = $this->db->fetchAll("
-            SELECT ci.*, p.name, p.sku, pp.price, pp.vat_rate, (pp.price * ci.quantity) as line_total
+            SELECT ci.*, COALESCE(pt.name, p.sku) as name, p.sku, pbp.price, b.tax_rate as vat_rate, (pbp.price * ci.quantity) as line_total
             FROM cart_items ci
             JOIN products p ON p.id = ci.product_id
-            LEFT JOIN product_prices pp ON pp.product_id = p.id AND pp.branch_id = ?
+            JOIN carts c ON c.id = ci.cart_id
+            JOIN branches b ON b.id = c.branch_id
+            LEFT JOIN product_translations pt ON pt.product_id = p.id AND pt.lang_code = 'de'
+            LEFT JOIN product_branch_prices pbp ON pbp.product_id = p.id AND pbp.branch_id = ? AND pbp.price_group = 'standard' AND pbp.variant_id IS NULL
             WHERE ci.cart_id = ?
         ", [$branchId, $cart['id']]);
         
@@ -45,15 +52,16 @@ class CheckoutController extends Controller {
         
         // Get customer addresses
         $addresses = $this->db->fetchAll(
-            "SELECT * FROM customer_addresses WHERE customer_id = ? ORDER BY is_default DESC, id DESC",
+            "SELECT * FROM addresses WHERE customer_id = ? ORDER BY type, is_default DESC, id DESC",
             [$customer['id']]
         );
         
         // Get payment methods
-        $paymentMethods = $this->db->fetchAll(
-            "SELECT * FROM payment_methods WHERE is_active = 1 AND branch_id IN (?, NULL) ORDER BY sort_order",
-            [$branchId]
-        );
+        $paymentMethods = [
+            ['id' => 'credit_card', 'name' => 'Kreditkarte'],
+            ['id' => 'paypal', 'name' => 'PayPal'],
+            ['id' => 'bank_transfer', 'name' => 'Vorkasse']
+        ];
         
         $this->view('checkout/index', [
             'title' => 'Kasse',
@@ -99,7 +107,7 @@ class CheckoutController extends Controller {
             
             // Verify address belongs to customer
             $address = $this->db->fetchOne(
-                "SELECT * FROM customer_addresses WHERE id = ? AND customer_id = ?",
+                "SELECT * FROM addresses WHERE id = ? AND customer_id = ?",
                 [$data['address_id'], $customer['id']]
             );
             
@@ -109,10 +117,12 @@ class CheckoutController extends Controller {
             
             // Get cart items
             $items = $this->db->fetchAll("
-                SELECT ci.*, pp.price, pp.vat_rate
+                SELECT ci.*, pbp.price, b.tax_rate as vat_rate
                 FROM cart_items ci
                 JOIN products p ON p.id = ci.product_id
-                LEFT JOIN product_prices pp ON pp.product_id = p.id AND pp.branch_id = ?
+                JOIN carts c ON c.id = ci.cart_id
+                JOIN branches b ON b.id = c.branch_id
+                LEFT JOIN product_branch_prices pbp ON pbp.product_id = p.id AND pbp.branch_id = ? AND pbp.price_group = 'standard' AND pbp.variant_id IS NULL
                 WHERE ci.cart_id = ?
             ", [$branchId, $cart['id']]);
             

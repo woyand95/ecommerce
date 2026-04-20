@@ -8,7 +8,7 @@
     <div class="product-card__image-wrap">
         <a href="<?= $v->url('/products/' . $v->e($product['url_slug'])) ?>" tabindex="-1" aria-hidden="true">
             <img class="product-card__image"
-                 src="<?= $v->e($product['primary_image'] ?? '/assets/images/placeholder.webp') ?>"
+                 src="<?= $v->asset('img/' . ($product['primary_image'] ?? 'placeholder.webp')) ?>"
                  alt="<?= $v->e($product['name']) ?>"
                  width="400" height="400"
                  loading="lazy"
