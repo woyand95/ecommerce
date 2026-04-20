@@ -189,22 +189,21 @@ class AuthController extends Controller {
             // Create default address if provided
             if (!empty($data['address_line1'])) {
                 $this->db->execute("
-                    INSERT INTO customer_addresses (
-                        customer_id, address_label, first_name, last_name, company_name,
-                        address_line1, address_line2, city, postal_code, country_code,
-                        phone, is_default, created_at
-                    ) VALUES (?, 'Privatadresse', ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW())
+                    INSERT INTO addresses (
+                        customer_id, type, label, first_name, last_name, company,
+                        street, address_line2, city, postal_code, country_code,
+                        is_default, created_at
+                    ) VALUES (?, 'shipping', 'Privatadresse', ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW())
                 ", [
                     $customerId,
                     $data['first_name'],
                     $data['last_name'],
                     $data['company_name'] ?? null,
-                    $data['address_line1'] ?? null,
+                    $data['address_line1'] ?? 'Default Street',
                     $data['address_line2'] ?? null,
-                    $data['city'] ?? null,
-                    $data['postal_code'] ?? null,
-                    $data['country_code'] ?? 'DE',
-                    $data['phone'] ?? null
+                    $data['city'] ?? 'Default City',
+                    $data['postal_code'] ?? '00000',
+                    $data['country_code'] ?? 'DE'
                 ]);
             }
             
