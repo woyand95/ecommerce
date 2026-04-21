@@ -6,8 +6,8 @@ use App\Core\Controller;
 
 class AuthController extends Controller {
     
-    public function __construct(string $scope = 'backend') {
-        parent::__construct($scope);
+    public function __construct(\App\Core\Request $request = null, \App\Core\Response $response = null) {
+        parent::__construct($request, $response, 'backend');
     }
 
     public function loginForm(array $p = []): void {
