@@ -81,14 +81,12 @@ class OrderController extends Controller {
         }
         
         $items = $this->db->fetchAll(
-            "SELECT oi.*, p.name, p.sku FROM order_items oi JOIN products p ON p.id = oi.product_id WHERE oi.order_id = ?",
+            "SELECT oi.* FROM order_items oi WHERE oi.order_id = ?",
             [$orderId]
         );
         
-        $address = $this->db->fetchOne(
-            "SELECT * FROM order_addresses WHERE order_id = ? AND address_type = 'shipping'",
-            [$orderId]
-        );
+        // order address snapshot is now in order.shipping_address
+        $address = json_decode($order['shipping_address'] ?? '[]', true);
         
         $this->view('admin/orders/show', [
             'title' => 'Bestellung #' . $order['order_number'],
