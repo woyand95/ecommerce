@@ -28,6 +28,11 @@
           href="/<?= $v->e($altLang['code']) ?><?= $v->e(request_path()) ?>">
     <?php endforeach; ?>
 
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <!-- Styles -->
     <link rel="stylesheet" href="<?= $v->asset('css/app.css') ?>">
     <?= $v->yield('head_styles') ?>
@@ -46,7 +51,7 @@
 <body class="branch-<?= $v->e($branch['slug'] ?? 'default') ?> lang-<?= $v->e($lang->getCurrent()) ?>">
 
 <!-- Skip to content (accessibility) -->
-<a class="skip-link" href="#main-content"><?= $v->t('layout.skip_to_content') ?></a>
+<a class="sr-only" href="#main-content"><?= $v->t('layout.skip_to_content') ?></a>
 
 <!-- ═══ HEADER ═══════════════════════════════════════════════ -->
 <?= $v->partial('header', ['branch' => $branch]) ?>
@@ -60,7 +65,50 @@
 </main>
 
 <!-- ═══ FOOTER ══════════════════════════════════════════════ -->
-<?= $v->partial('footer', ['branch' => $branch]) ?>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="footer-logo">TechStore</span>
+        <p>Premium electronics and accessories with next-day delivery. Discover our curated collection of top-tier gadgets.</p>
+      </div>
+
+      <div>
+        <h4 class="footer-heading">Shop</h4>
+        <ul class="footer-links">
+          <li><a href="<?= $v->url('/products') ?>">All Products</a></li>
+          <li><a href="<?= $v->url('/smartphones') ?>">Smartphones</a></li>
+          <li><a href="<?= $v->url('/laptops') ?>">Laptops</a></li>
+          <li><a href="<?= $v->url('/audio') ?>">Audio & HiFi</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="footer-heading">Customer Service</h4>
+        <ul class="footer-links">
+          <li><a href="<?= $v->url('/contact') ?>">Contact Us</a></li>
+          <li><a href="<?= $v->url('/shipping') ?>">Shipping & Delivery</a></li>
+          <li><a href="<?= $v->url('/returns') ?>">Returns Policy</a></li>
+          <li><a href="<?= $v->url('/faq') ?>">FAQ</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="footer-heading">Legal</h4>
+        <ul class="footer-links">
+          <li><a href="<?= $v->url('/terms') ?>">Terms of Service</a></li>
+          <li><a href="<?= $v->url('/privacy') ?>">Privacy Policy</a></li>
+          <li><a href="<?= $v->url('/cookies') ?>">Cookie Policy</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>&copy; <?= date('Y') ?> TechStore. All rights reserved.</span>
+      <span>Branch: <strong><?= $v->e($branch['name'] ?? 'Main Branch') ?></strong></span>
+    </div>
+  </div>
+</footer>
 
 <!-- ═══ CART DRAWER (off-canvas) ════════════════════════════ -->
 <?= $v->partial('cart-drawer') ?>
