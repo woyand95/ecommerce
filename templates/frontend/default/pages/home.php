@@ -1,39 +1,40 @@
 <?php $v->extend('main'); ?>
 
-<!-- Hero Banner -->
-<section class="hero hero-banner">
+<!-- Modern Hero Banner -->
+<section class="hero">
   <div class="container hero-container">
     <h1 class="hero-title">
-      Willkommen bei <span class="text-highlight">TechStore</span>
+      Next-Gen Tech, <br>
+      <span class="text-highlight">Delivered Today.</span>
     </h1>
     <p class="hero-subtitle">
-      Smartphones, Laptops, Audio & Smart Home –<br>günstig kaufen & schnell geliefert.
+      Discover the latest smartphones, powerful laptops, and immersive audio gear. Upgrade your life with our premium selection.
     </p>
     <div class="hero-actions">
       <a href="<?= $v->url('/products') ?>" class="btn btn--lg btn--accent">
-        Alle Produkte entdecken
+        Shop Collection
       </a>
-      <a href="<?= $v->url('/smartphones') ?>" class="btn btn--lg btn--secondary btn--outline-light">
-        Smartphones ansehen
+      <a href="<?= $v->url('/categories') ?>" class="btn btn--lg btn--outline" style="color: white; border-color: rgba(255,255,255,0.3);">
+        Browse Categories
       </a>
     </div>
   </div>
 </section>
 
-<!-- Category Quick-Links -->
+<!-- Quick Categories -->
 <section class="section-categories">
   <div class="container">
-    <h2 class="section-title text-center">Kategorien</h2>
+    <h2 class="section-title">Shop by Category</h2>
     <div class="category-grid">
       <?php foreach([
-        ['📱','Smartphones','/products'],
-        ['💻','Laptops','/products'],
-        ['🎧','Audio & HiFi','/products'],
-        ['📷','Kameras','/products'],
-        ['🎮','Gaming','/products'],
-        ['🏠','Smart Home','/products'],
-        ['📱','Tablets','/products'],
-        ['🔌','Zubehör','/products'],
+        ['📱','Smartphones','/products?category=smartphones'],
+        ['💻','Laptops','/products?category=laptops'],
+        ['🎧','Audio','/products?category=audio'],
+        ['⌚','Wearables','/products?category=wearables'],
+        ['🎮','Gaming','/products?category=gaming'],
+        ['📷','Cameras','/products?category=cameras'],
+        ['🖥️','Monitors','/products?category=monitors'],
+        ['🔌','Accessories','/products?category=accessories'],
       ] as [$icon, $name, $url]): ?>
       <a href="<?= $v->url($url) ?>" class="category-card">
         <span class="category-icon"><?= $icon ?></span>
@@ -48,14 +49,14 @@
 <section class="section-featured">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">Featured Products</h2>
-      <a href="<?= $v->url('/products') ?>" class="link-more">Alle ansehen →</a>
+      <h2 class="section-title">Trending Now</h2>
+      <a href="<?= $v->url('/products') ?>" class="link-more">View All Products &rarr;</a>
     </div>
 
     <?php if (empty($featured_products)): ?>
-    <div class="empty-state">
-      <p class="empty-title">Keine Produkte gefunden. Bitte Datenbank prüfen.</p>
-      <p class="empty-subtitle">Seed-Dateien laden: <code>mysql -u root -p ecommerce &lt; database/seeds/seed_all.sql</code></p>
+    <div class="text-center" style="padding: 4rem 0; color: var(--color-gray-500);">
+      <p style="font-size: 1.25rem; font-weight: 500; margin-bottom: 0.5rem;">No featured products available.</p>
+      <p>Check back later or browse our full catalog.</p>
     </div>
     <?php else: ?>
     <div class="product-grid">
@@ -67,63 +68,14 @@
   </div>
 </section>
 
-<!-- USP Banner -->
-<section class="section-usp">
-  <div class="container">
-    <div class="usp-grid">
-      <?php foreach([
-        ['🚚','Kostenloser Versand','Ab 49 € Bestellwert'],
-        ['↩️','30 Tage Rückgabe','Einfach & unkompliziert'],
-        ['🛡️','2 Jahre Garantie','Auf alle Produkte'],
-        ['💬','Expertenberatung','Mo–Sa 8–20 Uhr'],
-      ] as [$icon, $title, $text]): ?>
-      <div class="usp-item">
-        <div class="usp-icon"><?= $icon ?></div>
-        <div class="usp-title"><?= $title ?></div>
-        <div class="usp-text"><?= $text ?></div>
-      </div>
-      <?php endforeach; ?>
-    </div>
+<!-- Newsletter / Call to Action -->
+<section style="background-color: var(--color-primary-dark); padding: var(--space-16) 0; color: white; text-align: center;">
+  <div class="container" style="max-width: 600px;">
+    <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: var(--space-4);">Join the TechStore Community</h2>
+    <p style="color: var(--color-gray-300); margin-bottom: var(--space-8);">Subscribe to our newsletter for exclusive deals, early access to new products, and tech tips.</p>
+    <form style="display: flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center;" onsubmit="event.preventDefault(); alert('Subscribed!');">
+      <input type="email" placeholder="Enter your email address" required style="padding: 0.75rem 1rem; border-radius: var(--radius-md); border: none; flex: 1; min-width: 250px;">
+      <button type="submit" class="btn btn--accent">Subscribe</button>
+    </form>
   </div>
 </section>
-
-<!-- Footer -->
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <span class="footer-logo">TechStore</span>
-        <p class="footer-tagline">Ihr Elektronik-Fachhandel mit 5 Filialen in Deutschland & Österreich.</p>
-      </div>
-      <div>
-        <h4 class="footer-heading">Shop</h4>
-        <ul class="footer-links">
-          <li><a href="<?= $v->url('/products') ?>">Alle Produkte</a></li>
-          <li><a href="<?= $v->url('/smartphones') ?>">Smartphones</a></li>
-          <li><a href="<?= $v->url('/laptops-notebooks') ?>">Laptops</a></li>
-          <li><a href="<?= $v->url('/audio-hifi') ?>">Audio & HiFi</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="footer-heading">Service</h4>
-        <ul class="footer-links">
-          <li><a href="<?= $v->url('/garantie-ruecksendungen') ?>">Garantie & Rückgabe</a></li>
-          <li><a href="<?= $v->url('/geschaeftskunden') ?>">Für Unternehmen</a></li>
-          <li><a href="<?= $v->url('/kontakt') ?>">Kontakt</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="footer-heading">Rechtliches</h4>
-        <ul class="footer-links">
-          <li><a href="<?= $v->url('/impressum') ?>">Impressum</a></li>
-          <li><a href="<?= $v->url('/datenschutz') ?>">Datenschutz</a></li>
-          <li><a href="<?= $v->url('/agb') ?>">AGB</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© <?= date('Y') ?> TechStore GmbH. Alle Rechte vorbehalten.</span>
-      <span>Filiale: <strong><?= $v->e($branch['name'] ?? 'Hauptfiliale') ?></strong></span>
-    </div>
-  </div>
-</footer>
