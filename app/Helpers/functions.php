@@ -229,3 +229,26 @@ function session_flash_get(): array
     return $flashes;
 }
 }
+
+// ── View Helpers ──────────────────────────────────────────
+
+if (!function_exists('csrf_token')) {
+    function csrf_token(): string
+    {
+        return \App\Core\Csrf::token();
+    }
+}
+
+if (!function_exists('admin_nav_item')) {
+    function admin_nav_item(string $url, string $icon, string $label): string {
+        $active = (str_starts_with($_SERVER['REQUEST_URI'] ?? '', $url)) ? 'active' : '';
+        return sprintf(
+            '<a href="%s" class="nav-link %s"><svg class="icon" aria-hidden="true"><use href="%s#%s"></use></svg>%s</a>',
+            htmlspecialchars($url),
+            $active,
+            asset('icons/admin-sprite.svg'),
+            htmlspecialchars($icon),
+            htmlspecialchars($label)
+        );
+    }
+}
