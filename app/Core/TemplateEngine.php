@@ -161,8 +161,13 @@ class TemplateEngine
         $v   = $this;   // Template engine instance available as $v inside templates
 
         ob_start();
-        include $filePath;
-        return ob_get_clean();
+        try {
+            include $filePath;
+            return ob_get_clean();
+        } catch (\Throwable $e) {
+            ob_end_clean();
+            throw new \RuntimeException("Error rendering template {$filePath}: " . $e->getMessage(), 0, $e);
+        }
     }
 
     /**

@@ -78,7 +78,7 @@
                     <li><a href="<?= $v->url('/account/orders') ?>"><?= $v->t('account.orders') ?></a></li>
                     <li><a href="<?= $v->url('/account/profile') ?>"><?= $v->t('account.profile') ?></a></li>
                     <li><a href="<?= $v->url('/account/addresses') ?>"><?= $v->t('account.addresses') ?></a></li>
-                    <?php if ($auth->customer()['type'] === 'company'): ?>
+                    <?php if (($auth->customer()['type'] ?? '') === 'company'): ?>
                     <li><a href="<?= $v->url('/account/documents') ?>"><?= $v->t('account.documents') ?></a></li>
                     <?php endif; ?>
                     <li class="divider"></li>
